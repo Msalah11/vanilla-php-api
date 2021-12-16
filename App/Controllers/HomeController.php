@@ -8,7 +8,7 @@ class HomeController extends BaseController
 {
     public function __construct()
     {
-//        $this->registerMiddleware(new AuthMiddleware());
+        $this->registerMiddleware(new AuthMiddleware());
     }
 
     public function index()
