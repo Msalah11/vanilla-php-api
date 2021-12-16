@@ -1,4 +1,7 @@
 {
+  "require": {
+    "php": "^7.3|^8.0"
+  },
   "autoload": {
     "classmap": [
       "./"
