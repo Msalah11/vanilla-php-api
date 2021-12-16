@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Exceptions\NotFoundException;
 use Exception;
 
 class Route
@@ -86,16 +87,16 @@ class Route
      */
     public function call(string $uri, string $requestType)
     {
-        if (array_key_exists($uri, $this->routes[$requestType])) {
+        $callback = array_key_exists($uri, $this->routes[$requestType]) ?? false;
 
-            return $this->callAction(
-                reset($this->routes[$requestType][$uri]),
-                end($this->routes[$requestType][$uri])
-            );
-
+        if (!$callback) {
+            throw new NotFoundException();
         }
 
-        throw new Exception('No route defined for this URI.');
+        return $this->callAction(
+            reset($this->routes[$requestType][$uri]),
+            end($this->routes[$requestType][$uri])
+        );
     }
 
     /**
@@ -110,7 +111,10 @@ class Route
     {
         $controller = "App\\Controllers\\{$controller}";
         $controller = new $controller;
-
+        $middlewares = $controller->getMiddlewares();
+        foreach ($middlewares as $middleware) {
+            $middleware->handle();
+        }
         if (!method_exists($controller, $action)) {
             throw new Exception(
                 "{$controller} does not have the {$action} method."

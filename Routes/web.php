@@ -2,6 +2,6 @@
 
 $router = new \App\Core\Route();
 
-$router->get('', ['Controller', 'method']);
+$router->get('', ['HomeController', 'index']);
 
 //var_dump($router->routes);
