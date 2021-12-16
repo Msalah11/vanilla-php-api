@@ -3,5 +3,4 @@
 $router = new \App\Core\Route();
 
 $router->get('', ['HomeController', 'index']);
-
-//var_dump($router->routes);
+$router->get('about-us', ['HomeController', 'about']);

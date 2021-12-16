@@ -88,7 +88,6 @@ class Route
     public function call(string $uri, string $requestType)
     {
         $callback = array_key_exists($uri, $this->routes[$requestType]) ?? false;
-
         if (!$callback) {
             throw new NotFoundException();
         }
@@ -112,9 +111,11 @@ class Route
         $controller = "App\\Controllers\\{$controller}";
         $controller = new $controller;
         $middlewares = $controller->getMiddlewares();
+
         foreach ($middlewares as $middleware) {
             $middleware->handle();
         }
+
         if (!method_exists($controller, $action)) {
             throw new Exception(
                 "{$controller} does not have the {$action} method."
