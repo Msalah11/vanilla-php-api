@@ -14,12 +14,23 @@ class UserController extends BaseController
     public function login()
     {
         $this->validateLogin();
+        $request = (new LoginRequest())->getBody();
 
+        $user = (new User())->find(['email' => $request['email']]);
 
-        $token = $this->generateJwt(['username'=> 'salah', 'exp'=>(time() + 60)]);
+        if(!$user) {
+            return $this->sendError('User does not exist with this email address');
+        }
+
+        if (!password_verify($request['password'], $user->password)) {
+            return $this->sendError('Password is incorrect');
+        }
+
+        $token = $this->generateJwt(['username'=> $user->name, 'exp'=>(time() + 60)]);
 
         $this->sendSuccess([
-            'token' => $token
+            'token' => $token,
+            'user' => $user
         ]);
     }
 
