@@ -9,3 +9,4 @@ $router->get('install', ['HomeController', 'install']);
 
 // Auth Endpoints
 $router->post('api/login', ['UserController', 'login']);
+$router->post('api/register', ['UserController', 'register']);

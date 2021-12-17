@@ -91,15 +91,16 @@ class QueryBuilder
         return $statement->execute();
     }
 
-    public function create(string $table, array $data): bool
+    public function create(string $table, array $data)
     {
         $keys = implode(', ', array_keys($data));
         $query = "INSERT INTO {$table} ({$keys})";
         $query .= $this->processInsertedData($data);
 
         $statement = $this->pdo->prepare($query);
+        $statement->execute();
 
-        return $statement->execute();
+        return $this->find($table, ['*'], ['id' => $this->pdo->lastInsertId()]);
     }
 
     /**
