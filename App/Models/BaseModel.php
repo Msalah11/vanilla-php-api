@@ -70,6 +70,20 @@ abstract class BaseModel
      */
     public function create(array $data)
     {
+        $data = $this->filterData($data);
+
         return $this->builder->create($this->table, $data);
+    }
+
+    private function filterData($items)
+    {
+        foreach ($items as $key => $item) {
+
+            if (array_search($key, $this->attributes) === false) {
+                unset($items[$key]);
+            }
+        }
+
+        return $items;
     }
 }
