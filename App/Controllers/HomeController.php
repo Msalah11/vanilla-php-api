@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\Database\Migration;
 use App\Middlewares\AuthMiddleware;
 use App\Requests\LoginRequest;
 use App\Models\User;
@@ -20,6 +21,10 @@ class HomeController extends BaseController
         exit();
     }
 
+    public function install()
+    {
+        return (new Migration())->doMigrations();
+    }
 
     private function validateLogin(): array
     {
