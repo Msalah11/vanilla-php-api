@@ -3,7 +3,6 @@
 namespace App\Middlewares;
 
 use App\Exceptions\ForbiddenException;
-use Closure;
 use Exception;
 
 class AuthMiddleware extends BaseMiddleware
@@ -17,7 +16,7 @@ class AuthMiddleware extends BaseMiddleware
     {
         $response = true;
 
-        if(!$response) {
+        if (!$response) {
             throw new ForbiddenException();
         }
 

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\App\Models;
+namespace App\Models;
 
 use App\Core\Application;
-use App\Core\Database\QueryBuilder;
 use Exception;
 
 abstract class BaseModel

@@ -18,7 +18,7 @@ class Connection
     {
         try {
             return new PDO(
-                $databaseConfig['connection'].';dbname='.$databaseConfig['name'],
+                $databaseConfig['connection'] . ';dbname=' . $databaseConfig['name'],
                 $databaseConfig['username'],
                 $databaseConfig['password'],
                 $databaseConfig['options']

@@ -11,17 +11,6 @@ abstract class BaseRequest
 
     public array $errors = [];
 
-
-    /**
-     * Get Request Method
-     *
-     * @return string
-     */
-    public function getMethod(): string
-    {
-        return strtolower($_SERVER['REQUEST_METHOD']);
-    }
-
     /**
      * Get Request URL
      *
@@ -38,60 +27,6 @@ abstract class BaseRequest
     }
 
     /**
-     * Check if request is get
-     *
-     * @return bool
-     */
-    public function isGet(): bool
-    {
-        return $this->getMethod() === 'get';
-    }
-
-    /**
-     * Check if request is post
-     *
-     * @return bool
-     */
-    public function isPost(): bool
-    {
-        return $this->getMethod() === 'post';
-    }
-
-    /**
-     * Get Request Body
-     *
-     * @return array
-     */
-    public function getBody(): array
-    {
-        $data = [];
-
-        if ($this->isGet()) {
-            foreach ($_GET as $key => $value) {
-                $data[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-        }
-
-        if ($this->isPost()) {
-            foreach ($_POST as $key => $value) {
-                $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules(): array
-    {
-        return [];
-    }
-
-    /**
      * Validate the request rules.
      *
      * @return array
@@ -100,7 +35,7 @@ abstract class BaseRequest
     {
         foreach ($this->rules() as $attribute => $rules) {
 
-            if(!isset($this->getBody()[$attribute])) {
+            if (!isset($this->getBody()[$attribute])) {
                 $this->addErrorByRule($attribute, self::RULE_REQUIRED);
 
                 return $this->errors;
@@ -137,18 +72,77 @@ abstract class BaseRequest
     }
 
     /**
-     * The validation error messages
+     * Get the validation rules that apply to the request.
      *
-     * @return string[]
+     * @return array
      */
-    public function errorMessages(): array
+    public function rules(): array
     {
-        return [
-            self::RULE_REQUIRED => 'This field is required',
-            self::RULE_EMAIL => 'This field must be valid email address',
-            self::RULE_MIN => 'Min length of this field must be {min}',
-            self::RULE_MAX => 'Max length of this field must be {max}',
-        ];
+        return [];
+    }
+
+    /**
+     * Get Request Body
+     *
+     * @return array
+     */
+    public function getBody(): array
+    {
+        $data = [];
+
+        if ($this->isGet()) {
+            foreach ($_GET as $key => $value) {
+                $data[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
+        }
+
+        if ($this->isPost()) {
+            foreach ($_POST as $key => $value) {
+                $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Check if request is get
+     *
+     * @return bool
+     */
+    public function isGet(): bool
+    {
+        return $this->getMethod() === 'get';
+    }
+
+    /**
+     * Get Request Method
+     *
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return strtolower($_SERVER['REQUEST_METHOD']);
+    }
+
+    /**
+     * Check if request is post
+     *
+     * @return bool
+     */
+    public function isPost(): bool
+    {
+        return $this->getMethod() === 'post';
+    }
+
+    protected function addErrorByRule(string $attribute, string $rule, $params = [])
+    {
+        $params['field'] ??= $attribute;
+        $errorMessage = $this->errorMessage($rule);
+        foreach ($params as $key => $value) {
+            $errorMessage = str_replace("{{$key}}", $value, $errorMessage);
+        }
+        $this->errors[$attribute][] = $errorMessage;
     }
 
     /**
@@ -162,14 +156,19 @@ abstract class BaseRequest
         return $this->errorMessages()[$rule];
     }
 
-    protected function addErrorByRule(string $attribute, string $rule, $params = [])
+    /**
+     * The validation error messages
+     *
+     * @return string[]
+     */
+    public function errorMessages(): array
     {
-        $params['field'] ??= $attribute;
-        $errorMessage = $this->errorMessage($rule);
-        foreach ($params as $key => $value) {
-            $errorMessage = str_replace("{{$key}}", $value, $errorMessage);
-        }
-        $this->errors[$attribute][] = $errorMessage;
+        return [
+            self::RULE_REQUIRED => 'This field is required',
+            self::RULE_EMAIL => 'This field must be valid email address',
+            self::RULE_MIN => 'Min length of this field must be {min}',
+            self::RULE_MAX => 'Max length of this field must be {max}',
+        ];
     }
 
 }

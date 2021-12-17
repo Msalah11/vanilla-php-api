@@ -11,13 +11,13 @@ class Application
      *
      * @var array
      */
-    public static $registry = [];
+    public static array $registry = [];
 
     /**
      * Bind a new key/value into the container.
      *
      * @param string $key
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public static function bind(string $key, $value)
     {
@@ -33,7 +33,7 @@ class Application
      */
     public static function get(string $key)
     {
-        if (! array_key_exists($key, static::$registry)) {
+        if (!array_key_exists($key, static::$registry)) {
             throw new Exception("No {$key} is bound in the container.");
         }
 
