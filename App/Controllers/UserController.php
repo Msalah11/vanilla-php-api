@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Requests\LoginRequest;
 use App\Requests\RegisterRequest;
+use App\Resources\UserResource;
 use App\Traits\JWT;
 use App\Traits\HttpResponse;
 
@@ -36,7 +37,7 @@ class UserController extends BaseController
 
         $this->sendSuccess([
             'token' => $this->generateToken($user->name),
-            'user' => $user
+            'user' => (new UserResource())->resource($user)
         ]);
     }
 
@@ -54,7 +55,7 @@ class UserController extends BaseController
 
         $this->sendSuccess([
             'token' => $this->generateToken($insertedUser->name),
-            'user' => $insertedUser
+            'user' => (new UserResource())->resource($insertedUser)
         ]);
     }
 
