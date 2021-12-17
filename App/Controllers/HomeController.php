@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Middlewares\AuthMiddleware;
+use App\Requests\LoginRequest;
 
 class HomeController extends BaseController
 {
@@ -13,11 +14,18 @@ class HomeController extends BaseController
 
     public function index()
     {
-        echo 'welcome';
+
+        if(!empty($this->validateLogin())) {
+            echo json_encode(
+                $this->validateLogin()
+            );
+        }
+
     }
 
-    public function about()
+
+    private function validateLogin(): array
     {
-        echo 'about us';
+        return (new LoginRequest())->validation();
     }
 }

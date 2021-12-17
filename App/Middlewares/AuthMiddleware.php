@@ -15,7 +15,7 @@ class AuthMiddleware extends BaseMiddleware
      */
     public function handle()
     {
-        $response = false;
+        $response = true;
 
         if(!$response) {
             throw new ForbiddenException();
