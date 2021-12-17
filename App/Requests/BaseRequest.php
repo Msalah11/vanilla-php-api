@@ -2,7 +2,6 @@
 
 namespace App\Requests;
 
-
 abstract class BaseRequest
 {
     const RULE_REQUIRED = 'required';

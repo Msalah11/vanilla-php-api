@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\App\Models\User;
 use App\Middlewares\AuthMiddleware;
 use App\Requests\LoginRequest;
 
@@ -14,13 +15,8 @@ class HomeController extends BaseController
 
     public function index()
     {
-
-        if(!empty($this->validateLogin())) {
-            echo json_encode(
-                $this->validateLogin()
-            );
-        }
-
+        $users = (new User())->all();
+        var_dump($users);exit();
     }
 
 
