@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Requests\{StoreListRequest, UpdateListRequest};
+use App\Requests\{DeleteListRequest, StoreListRequest, UpdateListRequest};
 use App\Middlewares\AuthMiddleware;
 use App\Resources\ListResource;
 use App\Traits\HttpResponse;
@@ -15,6 +15,7 @@ class ListController extends BaseController
     private Category $list;
     private StoreListRequest $storeListRequest;
     private UpdateListRequest $updateListRequest;
+    private DeleteListRequest $deleteListRequest;
 
     public function __construct()
     {
@@ -23,6 +24,7 @@ class ListController extends BaseController
         $this->list = new Category();
         $this->storeListRequest = new StoreListRequest();
         $this->updateListRequest = new UpdateListRequest();
+        $this->deleteListRequest = new DeleteListRequest();
     }
 
     public function create()
@@ -54,10 +56,24 @@ class ListController extends BaseController
         $update = $this->list->update(['id' => $list->id], ['name' => $requests['name']]);
 
         if(!$update) {
-            return $this->sendError('There is an error happend. please try again later', 403);
+            return $this->sendError('There is an error happend. please try again later');
         }
 
         $this->sendSuccess([], 'List Updated Successfully');
+    }
+
+    public function delete()
+    {
+        $this->validateRequest('deleteListRequest');
+        $requests = $this->deleteListRequest->getBody();
+
+        $delete = $this->list->delete($requests);
+
+        if(!$delete) {
+            return $this->sendError('There is an error happend. please try again later');
+        }
+
+        $this->sendSuccess([], 'List Deleted Successfully');
     }
 
     private function validateRequest($request)

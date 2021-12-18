@@ -103,6 +103,18 @@ class QueryBuilder
         return $this->find($table, ['*'], ['id' => $this->pdo->lastInsertId()]);
     }
 
+    public function delete(string $table, array $conditions)
+    {
+        $query = "DELETE FROM {$table}";
+
+        if(!empty($conditions)) {
+            $query .= $this->processConditions($conditions);
+        }
+
+        $statement = $this->pdo->prepare($query);
+        return $statement->execute();
+    }
+
     /**
      * Execute an SQL statement.
      *

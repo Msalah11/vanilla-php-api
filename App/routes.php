@@ -14,3 +14,4 @@ $router->post('api/register', ['UserController', 'register']);
 // Lists Endpoints
 $router->post('api/lists', ['ListController', 'create']);
 $router->put('api/lists', ['ListController', 'update']);
+$router->delete('api/lists', ['ListController', 'delete']);

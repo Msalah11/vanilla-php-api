@@ -77,6 +77,14 @@ abstract class BaseModel
         return $this->builder->create($this->table, $data);
     }
 
+    /**
+     * Delete One record from database table.
+     */
+    public function delete(array $conditions)
+    {
+        return $this->builder->delete($this->table, $conditions);
+    }
+
     private function filterData($items)
     {
         foreach ($items as $key => $item) {
