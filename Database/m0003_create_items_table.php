@@ -28,7 +28,7 @@ class m0003_create_items_table
 
     public function down()
     {
-        $query = "DROP TABLE users;";
+        $query = "DROP TABLE items;";
         $this->builder->execute($query);
     }
 }

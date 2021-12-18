@@ -28,7 +28,7 @@ class m0002_create_lists_table
 
     public function down()
     {
-        $query = "DROP TABLE users;";
+        $query = "DROP TABLE lists;";
         $this->builder->execute($query);
     }
 }
