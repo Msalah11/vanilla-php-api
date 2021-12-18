@@ -3,10 +3,13 @@
 namespace App\Middlewares;
 
 use App\Exceptions\ForbiddenException;
+use App\Traits\JWT;
 use Exception;
 
 class AuthMiddleware extends BaseMiddleware
 {
+    use JWT;
+
     /**
      * Class AuthMiddleware
      *
@@ -14,9 +17,9 @@ class AuthMiddleware extends BaseMiddleware
      */
     public function handle()
     {
-        $response = true;
+        $token = $this->bearerToken();
 
-        if (!$response) {
+        if(empty($token) || !$this->isJwtValid($token)) {
             throw new ForbiddenException();
         }
 
