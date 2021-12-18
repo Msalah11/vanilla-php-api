@@ -7,6 +7,7 @@ use App\Requests\LoginRequest;
 use App\Requests\RegisterRequest;
 use App\Requests\RestPasswordRequest;
 use App\Resources\UserResource;
+use App\Services\Mail;
 use App\Traits\JWT;
 use App\Traits\HttpResponse;
 
@@ -86,7 +87,8 @@ class UserController extends BaseController
             return $this->sendError('There is an error happend. Please Try again later');
         }
 
-        // TODO SEND EMAIL TO USER
+        (new Mail())->send($user->email, $password);
+
         $this->sendSuccess([], 'The new Password has been sent to your email address');
     }
 

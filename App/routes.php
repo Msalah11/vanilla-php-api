@@ -10,6 +10,7 @@ $router->get('install', ['HomeController', 'install']);
 // Auth Endpoints
 $router->post('api/login', ['UserController', 'login']);
 $router->post('api/register', ['UserController', 'register']);
+$router->post('api/password-reset', ['UserController', 'resetPassword']);
 
 // Lists Endpoints
 $router->post('api/lists', ['ListController', 'create']);
