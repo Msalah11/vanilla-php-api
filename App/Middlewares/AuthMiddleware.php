@@ -17,9 +17,10 @@ class AuthMiddleware extends BaseMiddleware
      */
     public function handle()
     {
+        $user = authedUser();
         $token = $this->bearerToken();
 
-        if(empty($token) || !$this->isJwtValid($token)) {
+        if( (empty($token) || !$this->isJwtValid($token)) || (empty($user) || $token != $user->token) ) {
             throw new ForbiddenException();
         }
 
