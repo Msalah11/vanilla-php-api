@@ -102,7 +102,7 @@ abstract class BaseRequest
             }
         }
 
-        if ($this->isPut()) {
+        if ($this->isPut() || $this->isDelete()) {
             $requestData = $this->extractPutData();
             foreach ($requestData as $key => $value) {
                 $data[$key] = $value;
@@ -251,6 +251,16 @@ abstract class BaseRequest
     public function isPut(): bool
     {
         return $this->getMethod() === 'put';
+    }
+
+    /**
+     * Check if request is put
+     *
+     * @return bool
+     */
+    public function isDelete(): bool
+    {
+        return $this->getMethod() === 'delete';
     }
 
     protected function addErrorByRule(string $attribute, string $rule, $params = [])
