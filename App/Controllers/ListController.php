@@ -44,8 +44,20 @@ class ListController extends BaseController
         $list = $this->list->find(['id' => $requests['id']]);
 
         if(empty($list)) {
-            $this->sendError("No List Founded with this id {$requests['id']}");
+            return $this->sendError("No List Founded with this id {$requests['id']}");
         }
+
+        if($list->user_id != authedUser()->id) {
+            return $this->sendError('You don\'t have permission to access this page', 403);
+        }
+
+        $update = $this->list->update(['id' => $list->id], ['name' => $requests['name']]);
+
+        if(!$update) {
+            return $this->sendError('There is an error happend. please try again later', 403);
+        }
+
+        $this->sendSuccess([], 'List Updated Successfully');
     }
 
     private function validateRequest($request)
