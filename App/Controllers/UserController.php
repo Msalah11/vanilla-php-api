@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Requests\LoginRequest;
 use App\Requests\RegisterRequest;
+use App\Requests\RestPasswordRequest;
 use App\Resources\UserResource;
 use App\Traits\JWT;
 use App\Traits\HttpResponse;
@@ -14,16 +15,22 @@ class UserController extends BaseController
     use JWT, HttpResponse;
 
     private User $user;
+    private RestPasswordRequest $restPasswordRequest;
+    private LoginRequest $loginRequest;
+    private RegisterRequest $registerRequest;
 
     public function __construct()
     {
         $this->user = new User();
+        $this->loginRequest = new LoginRequest();
+        $this->registerRequest = new RegisterRequest();
+        $this->restPasswordRequest = new RestPasswordRequest();
     }
 
     public function login()
     {
-        $this->validateLogin();
-        $request = (new LoginRequest())->getBody();
+        $this->validateRequest('loginRequest');
+        $request = $this->loginRequest->getBody();
 
         $user = $this->user->find(['email' => $request['email']]);
 
@@ -46,8 +53,8 @@ class UserController extends BaseController
 
     public function register()
     {
-        $this->validateRegister();
-        $request = (new RegisterRequest())->modifiedData();
+        $this->validateRequest('registerRequest');
+        $request = $this->registerRequest->modifiedData();
         $user = $this->user->find(['email' => $request['email']]);
 
         if(!empty($user)) {
@@ -62,19 +69,30 @@ class UserController extends BaseController
         ]);
     }
 
-    private function validateLogin()
+    public function resetPassword()
     {
-        $validation = (new LoginRequest())->validation();
+        $this->validateRequest('restPasswordRequest');
+        $request = $this->restPasswordRequest->getBody();
+        $user = $this->user->find(['email' => $request['email']]);
 
-        if(!empty($validation)) {
-            $this->sendValidationError($validation);
-            die();
+        if(empty($user)) {
+            return $this->sendError('This Email is not exits');
         }
+
+        $password = rand(2345321232, 9876876778);
+        $updateUserPassword = $this->user->update(['id' => $user->id], ['password' => password_hash($password, PASSWORD_DEFAULT)]);
+
+        if(!$updateUserPassword) {
+            return $this->sendError('There is an error happend. Please Try again later');
+        }
+
+        // TODO SEND EMAIL TO USER
+        $this->sendSuccess([], 'The new Password has been sent to your email address');
     }
 
-    private function validateRegister()
+    private function validateRequest($request)
     {
-        $validation = (new RegisterRequest())->validation();
+        $validation = $this->{$request}->validation();
 
         if(!empty($validation)) {
             $this->sendValidationError($validation);
