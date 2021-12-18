@@ -81,7 +81,7 @@ class UserController extends BaseController
 
     private function generateToken($name): string
     {
-        return $this->generateJwt(['username'=> $name, 'exp'=>(time() + 60)]);
+        return $this->generateJwt(['username'=> $name, 'exp'=>(time() + (24*60*60))]);
     }
 
 }
