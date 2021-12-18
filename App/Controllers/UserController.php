@@ -35,9 +35,12 @@ class UserController extends BaseController
             return $this->sendError('Password is incorrect');
         }
 
+        $token = $this->generateToken($user->name);
+        $this->user->update(['id' => $user->id], ['token' => $this->generateToken($user->name)]);
+
         $this->sendSuccess([
-            'token' => $this->generateToken($user->name),
-            'user' => (new UserResource())->resource($user)
+            'user' => (new UserResource())->resource($user),
+            'token' => $token
         ]);
     }
 
