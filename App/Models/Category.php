@@ -9,4 +9,8 @@ class Category extends BaseModel
     protected array $attributes = [
         'name', 'user_id'
     ];
+
+    protected array $relations = [
+        'items' => 'list_id'
+    ];
 }

@@ -15,3 +15,4 @@ $router->post('api/register', ['UserController', 'register']);
 $router->post('api/lists', ['ListController', 'create']);
 $router->put('api/lists', ['ListController', 'update']);
 $router->delete('api/lists', ['ListController', 'delete']);
+$router->post('api/lists/items', ['ListController', 'addItem']);
