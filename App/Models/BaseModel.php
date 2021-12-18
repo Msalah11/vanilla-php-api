@@ -62,11 +62,13 @@ abstract class BaseModel
      */
     public function update(array $conditions, array $data)
     {
+        $data = $this->filterData($data);
+
         return $this->builder->update($this->table, $conditions, $data);
     }
 
     /**
-     * Update One record from a database table.
+     * Insert One record into database table.
      */
     public function create(array $data)
     {
