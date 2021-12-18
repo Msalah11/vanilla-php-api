@@ -71,9 +71,11 @@ class ListController extends BaseController
         $this->validateRequest('deleteListRequest');
         $requests = $this->deleteListRequest->getBody();
 
-        $delete = $this->list->delete($requests);
+        $deleteItems = $this->item->delete(['list_id' => $requests['id']]);
 
-        if(!$delete) {
+        $deleteList = $this->list->delete($requests);
+
+        if(!$deleteItems || !$deleteList) {
             return $this->sendError('There is an error happend. please try again later');
         }
 
