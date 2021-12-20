@@ -62,10 +62,12 @@ class UserController extends BaseController
             return $this->sendError('This Email is already exits');
         }
 
+        $request['token'] = $this->generateToken( $request['name'] );
+
         $insertedUser = $this->user->create($request);
 
         $this->sendSuccess([
-            'token' => $this->generateToken($insertedUser->name),
+            'token' => $request['token'],
             'user' => (new UserResource())->resource($insertedUser)
         ]);
     }
