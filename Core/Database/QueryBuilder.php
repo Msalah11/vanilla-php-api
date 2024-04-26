@@ -55,7 +55,7 @@ class QueryBuilder
         $columns = implode(',', $columns);
         $query = "select {$columns} from {$table}";
 
-        if(!empty($conditions)) {
+        if (!empty($conditions)) {
             $query .= $this->processConditions($conditions);
         }
 
@@ -73,16 +73,16 @@ class QueryBuilder
      * @param array $data
      * @return bool|false
      */
-    public function update(string $table, array $conditions , array $data): bool
+    public function update(string $table, array $conditions, array $data): bool
     {
 
         $query = "UPDATE {$table}";
 
-        if(!empty($data)) {
+        if (!empty($data)) {
             $query .= $this->processData($data);
         }
 
-        if(!empty($conditions)) {
+        if (!empty($conditions)) {
             $query .= $this->processConditions($conditions);
         }
 
@@ -100,14 +100,16 @@ class QueryBuilder
         $statement = $this->pdo->prepare($query);
         $statement->execute();
 
-        return $this->find($table, ['*'], ['id' => $this->pdo->lastInsertId()]);
+        $lastInsertId = isset($data['id']) ? $data['id'] : $this->pdo->lastInsertId();
+
+        return $this->find($table, ['*'], ['id' => $lastInsertId]);
     }
 
     public function delete(string $table, array $conditions)
     {
         $query = "DELETE FROM {$table}";
 
-        if(!empty($conditions)) {
+        if (!empty($conditions)) {
             $query .= $this->processConditions($conditions);
         }
 
@@ -130,7 +132,7 @@ class QueryBuilder
     {
         $attributes = array_keys($conditions);
 
-        $sql = implode(" AND ", array_map(fn($attr) => "$attr = '{$conditions[$attr]}'", $attributes));
+        $sql = implode(" AND ", array_map(fn ($attr) => "$attr = '{$conditions[$attr]}'", $attributes));
 
         return " WHERE {$sql}";
     }
@@ -139,7 +141,7 @@ class QueryBuilder
     {
         $attributes = array_keys($data);
 
-        $sql = implode(", ", array_map(fn($attr) => "$attr = '{$data[$attr]}'", $attributes));
+        $sql = implode(", ", array_map(fn ($attr) => "$attr = '{$data[$attr]}'", $attributes));
 
         return " SET {$sql}";
     }
@@ -148,7 +150,7 @@ class QueryBuilder
     {
         $attributes = array_keys($data);
 
-        $sql = implode(", ", array_map(fn($attr) => "'{$data[$attr]}'", $attributes));
+        $sql = implode(", ", array_map(fn ($attr) => "'{$data[$attr]}'", $attributes));
 
         return " VALUES({$sql})";
     }
