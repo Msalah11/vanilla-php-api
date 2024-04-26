@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Requests\{AddItemRequest, DeleteListRequest, StoreListRequest, UpdateListRequest};
 use App\Middlewares\AuthMiddleware;
-use App\Models\{Category, Item};
+use App\Models\{Category, Item, User};
 use App\Resources\ListResource;
 use App\Traits\HttpResponse;
 
@@ -14,6 +14,7 @@ class ListController extends BaseController
 
     private Category $list;
     private Item $item;
+    private User $user;
     private StoreListRequest $storeListRequest;
     private UpdateListRequest $updateListRequest;
     private DeleteListRequest $deleteListRequest;
@@ -25,6 +26,7 @@ class ListController extends BaseController
 
         $this->list = new Category();
         $this->item = new Item();
+        $this->user = new User();
         $this->storeListRequest = new StoreListRequest();
         $this->updateListRequest = new UpdateListRequest();
         $this->deleteListRequest = new DeleteListRequest();
@@ -60,6 +62,9 @@ class ListController extends BaseController
         if ($list->user_id != authedUser()->id) {
             return $this->sendError('You don\'t have permission to access this page', 403);
         }
+
+        $list->user = $this->user->find(['id' => $list->user_id]);
+        $list->items = $this->item->findAll(['list_id' => $id]);
 
         return $this->sendSuccess((new ListResource())->resource($list));
     }

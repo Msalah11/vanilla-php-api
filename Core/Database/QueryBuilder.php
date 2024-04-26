@@ -43,6 +43,31 @@ class QueryBuilder
     }
 
     /**
+     * Retrieve all records from a table.
+     *
+     * @param string $table The name of the table.
+     * @param array $columns The columns to retrieve. Default is ['*'].
+     * @param array $conditions The conditions to apply. Default is an empty array.
+     * @param string $mode The fetch mode. Default is 'CLASS'. Can be 'CLASS' or 'COLUMN'.
+     * @return array The fetched records.
+     */
+    public function findAll(string $table, array $columns = ['*'], array $conditions = [], string $mode = 'CLASS')
+    {
+        $columns = implode(',', $columns);
+        $mode = $mode == 'CLASS' ? PDO::FETCH_CLASS : PDO::FETCH_COLUMN;
+        $query = "select {$columns} from {$table}";
+
+        if (!empty($conditions)) {
+            $query .= $this->processConditions($conditions);
+        }
+
+        $statement = $this->pdo->prepare($query);
+        $statement->execute();
+
+        return $statement->fetchAll($mode);
+    }
+
+    /**
      * Find One Record.
      *
      * @param string $table

@@ -50,6 +50,14 @@ abstract class BaseModel
     }
 
     /**
+     * Select all records from a database table with conditions.
+     */
+    public function findAll(array $conditions = [], array $columns = ['*'])
+    {
+        return $this->builder->findAll($this->table, $columns, $conditions);
+    }
+
+    /**
      * Select One record from a database table with conditions.
      */
     public function find(array $conditions = [], array $columns = ['*'])
