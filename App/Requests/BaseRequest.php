@@ -97,19 +97,43 @@ abstract class BaseRequest
         }
 
         if ($this->isPost()) {
+            $json_data = $this->extractJsonData();
+
+            if (!empty($json_data))
+                $_POST = $json_data;
+
             foreach ($_POST as $key => $value) {
-                $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+                if (!empty($json_data))
+                    $data[$key] = $value;
+                else
+                    $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
         }
 
         if ($this->isPut() || $this->isDelete()) {
-            $requestData = $this->extractPutData();
+            $json_data = $this->extractJsonData();
+
+            if (!empty($json_data))
+                $requestData = $this->extractJsonData();
+            else
+                $requestData = $this->extractPutData();
+
             foreach ($requestData as $key => $value) {
                 $data[$key] = $value;
             }
         }
 
         return $data;
+    }
+
+    private function extractJsonData(): array
+    {
+        $json_data = json_decode(file_get_contents('php://input'), true);
+
+        if ($json_data === null)
+            return [];
+
+        return $json_data;
     }
 
     private function extractPutData(): array
@@ -144,9 +168,9 @@ abstract class BaseRequest
                 if (preg_match('#(.*)(=|: )(.*)#', $headerPart, $keyVal)) {
                     if ($keyVal[1] == "name") $key = substr($keyVal[3], 1, -1);
                     else {
-                        if($keyVal[2] == "="){
+                        if ($keyVal[2] == "=") {
                             $thisHeader[$keyVal[1]] = substr($keyVal[3], 1, -1);
-                        }else{
+                        } else {
                             $thisHeader[$keyVal[1]] = $keyVal[3];
                         }
                     }
@@ -208,7 +232,6 @@ abstract class BaseRequest
                 $return[$key] = $body;
                 $header[$key] = $thisHeader;
             }
-
         }
         return $return;
     }
@@ -298,5 +321,4 @@ abstract class BaseRequest
             self::RULE_MAX => 'Max length of this field must be {max}',
         ];
     }
-
 }
