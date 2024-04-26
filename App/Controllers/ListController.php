@@ -31,6 +31,13 @@ class ListController extends BaseController
         $this->addItemRequest = new AddItemRequest();
     }
 
+    public function index()
+    {
+        $lists = $this->list->all();
+
+        return $this->sendSuccess((new ListResource())->collection($lists));
+    }
+
     public function create()
     {
         $this->validateRequest('storeListRequest');
@@ -40,6 +47,21 @@ class ListController extends BaseController
         $this->sendSuccess(
             (new ListResource())->resource($list)
         );
+    }
+
+    public function find($id)
+    {
+        $list = $this->list->find(['id' => $id]);
+
+        if (empty($list)) {
+            return $this->sendError("No List Founded with this id {$id}");
+        }
+
+        if ($list->user_id != authedUser()->id) {
+            return $this->sendError('You don\'t have permission to access this page', 403);
+        }
+
+        return $this->sendSuccess((new ListResource())->resource($list));
     }
 
     public function update($id)

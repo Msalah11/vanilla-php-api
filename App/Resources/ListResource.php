@@ -4,17 +4,19 @@ namespace App\Resources;
 
 class ListResource extends BaseResource
 {
-
-    public function collection($collection)
+    /**
+     * Formats a resource into an array.
+     *
+     * @param mixed $resource The resource to be formatted.
+     * @return array The formatted resource as an array.
+     */
+    protected function formatResource($resource): array
     {
-        return $collection;
-    }
-
-    public function resource($resource): array
-    {
-        return [
+        $list = [
             'id' => $resource->id,
-            'name' => $resource->name,
+            'name' => $resource->name
         ];
+
+        return $list;
     }
 }
