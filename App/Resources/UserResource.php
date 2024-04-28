@@ -4,18 +4,20 @@ namespace App\Resources;
 
 class UserResource extends BaseResource
 {
-
-    public function collection($collection)
+    /**
+     * Formats a resource into an array.
+     *
+     * @param mixed $resource The resource to be formatted.
+     * @return array The formatted resource as an array.
+     */
+    protected function formatResource($resource): array
     {
-        return $collection;
-    }
-
-    public function resource($resource): array
-    {
-        return [
+        $user = [
             'id' => $resource->id,
             'name' => $resource->name,
             'email' => $resource->email,
         ];
+
+        return $user;
     }
 }

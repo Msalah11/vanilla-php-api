@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Requests\{AddItemRequest, DeleteListRequest, StoreListRequest, UpdateListRequest};
 use App\Middlewares\AuthMiddleware;
-use App\Models\{Category, Item};
+use App\Models\{Category, Item, User};
 use App\Resources\ListResource;
 use App\Traits\HttpResponse;
 
@@ -14,6 +14,7 @@ class ListController extends BaseController
 
     private Category $list;
     private Item $item;
+    private User $user;
     private StoreListRequest $storeListRequest;
     private UpdateListRequest $updateListRequest;
     private DeleteListRequest $deleteListRequest;
@@ -25,10 +26,18 @@ class ListController extends BaseController
 
         $this->list = new Category();
         $this->item = new Item();
+        $this->user = new User();
         $this->storeListRequest = new StoreListRequest();
         $this->updateListRequest = new UpdateListRequest();
         $this->deleteListRequest = new DeleteListRequest();
         $this->addItemRequest = new AddItemRequest();
+    }
+
+    public function index()
+    {
+        $lists = $this->list->all();
+
+        return $this->sendSuccess((new ListResource())->collection($lists));
     }
 
     public function create()
@@ -42,24 +51,42 @@ class ListController extends BaseController
         );
     }
 
-    public function update()
+    public function find($id)
     {
-        $this->validateRequest('updateListRequest');
-        $requests = $this->updateListRequest->getBody();
+        $list = $this->list->find(['id' => $id]);
 
-        $list = $this->list->find(['id' => $requests['id']]);
-
-        if(empty($list)) {
-            return $this->sendError("No List Founded with this id {$requests['id']}");
+        if (empty($list)) {
+            return $this->sendError("No List Founded with this id {$id}");
         }
 
-        if($list->user_id != authedUser()->id) {
+        if ($list->user_id != authedUser()->id) {
             return $this->sendError('You don\'t have permission to access this page', 403);
         }
 
-        $update = $this->list->update(['id' => $list->id], ['name' => $requests['name']]);
+        $list->user = $this->user->find(['id' => $list->user_id]);
+        $list->items = $this->item->findAll(['list_id' => $id]);
 
-        if(!$update) {
+        return $this->sendSuccess((new ListResource())->resource($list));
+    }
+
+    public function update($id)
+    {
+        $list = $this->list->find(['id' => $id]);
+
+        $this->validateRequest('updateListRequest');
+        $requests = $this->updateListRequest->modifiedData();
+
+        if (empty($list)) {
+            return $this->sendError("No List Founded with this id {$id}");
+        }
+
+        if ($list->user_id != authedUser()->id) {
+            return $this->sendError('You don\'t have permission to access this page', 403);
+        }
+
+        $update = $this->list->update(['id' => $list->id], $requests);
+
+        if (!$update) {
             return $this->sendError('There is an error happend. please try again later');
         }
 
@@ -75,38 +102,38 @@ class ListController extends BaseController
 
         $deleteList = $this->list->delete($requests);
 
-        if(!$deleteItems || !$deleteList) {
+        if (!$deleteItems || !$deleteList) {
             return $this->sendError('There is an error happend. please try again later');
         }
 
         $this->sendSuccess([], 'List Deleted Successfully');
     }
 
-    public function addItem()
+    public function addItem($id)
     {
-        $this->validateRequest('addItemRequest');
-        $requests = $this->deleteListRequest->getBody();
-        $list = $this->list->find(['id' => $requests['list_id']]);
+        $list = $this->list->find(['id' => $id]);
 
-        if(empty($list)) {
-            return $this->sendError("No List Founded with the id {$requests['list_id']}");
+        $this->validateRequest('addItemRequest');
+        $requests = $this->addItemRequest->modifiedData($id);
+
+        if (empty($list)) {
+            return $this->sendError("No List Founded with the id {$id}");
         }
 
-        if($list->user_id != authedUser()->id) {
+        if ($list->user_id != authedUser()->id) {
             return $this->sendError('You don\'t have permission to access this page', 403);
         }
 
         $item = $this->item->create($requests);
 
         $this->sendSuccess($item, 'Item Stored Successfully');
-
     }
 
     private function validateRequest($request)
     {
         $validation = $this->{$request}->validation();
 
-        if(!empty($validation)) {
+        if (!empty($validation)) {
             $this->sendValidationError($validation);
             die();
         }

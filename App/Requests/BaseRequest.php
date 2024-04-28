@@ -97,19 +97,43 @@ abstract class BaseRequest
         }
 
         if ($this->isPost()) {
+            $json_data = $this->extractJsonData();
+
+            if (!empty($json_data))
+                $_POST = $json_data;
+
             foreach ($_POST as $key => $value) {
-                $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+                if (!empty($json_data))
+                    $data[$key] = $value;
+                else
+                    $data[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
         }
 
         if ($this->isPut() || $this->isDelete()) {
-            $requestData = $this->extractPutData();
+            $json_data = $this->extractJsonData();
+
+            if (!empty($json_data))
+                $requestData = $this->extractJsonData();
+            else
+                $requestData = $this->extractPutData();
+
             foreach ($requestData as $key => $value) {
                 $data[$key] = $value;
             }
         }
 
         return $data;
+    }
+
+    private function extractJsonData(): array
+    {
+        $json_data = json_decode(file_get_contents('php://input'), true);
+
+        if ($json_data === null)
+            return [];
+
+        return $json_data;
     }
 
     private function extractPutData(): array
@@ -144,9 +168,9 @@ abstract class BaseRequest
                 if (preg_match('#(.*)(=|: )(.*)#', $headerPart, $keyVal)) {
                     if ($keyVal[1] == "name") $key = substr($keyVal[3], 1, -1);
                     else {
-                        if($keyVal[2] == "="){
+                        if ($keyVal[2] == "=") {
                             $thisHeader[$keyVal[1]] = substr($keyVal[3], 1, -1);
-                        }else{
+                        } else {
                             $thisHeader[$keyVal[1]] = $keyVal[3];
                         }
                     }
@@ -208,7 +232,6 @@ abstract class BaseRequest
                 $return[$key] = $body;
                 $header[$key] = $thisHeader;
             }
-
         }
         return $return;
     }
@@ -299,4 +322,20 @@ abstract class BaseRequest
         ];
     }
 
+    /**
+     * Generates a version 4 (random) UUID.
+     *
+     * @param string|null $data Optional data to use for generating the UUID.
+     * @return string The generated UUID.
+     */
+    public function guidv4($data = null): string
+    {
+        $data = $data ?? random_bytes(16);
+        assert(strlen($data) == 16);
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
 }

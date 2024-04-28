@@ -15,6 +15,7 @@ class StoreListRequest extends BaseRequest
     {
         $request = $this->getBody();
 
+        $request['id'] = $this->guidv4();
         $request['user_id'] = authedUser()->id;
 
         return $request;

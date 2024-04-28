@@ -16,10 +16,11 @@ class m0002_create_lists_table
     public function up()
     {
         $query = "CREATE TABLE lists (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id VARCHAR(36) DEFAULT (uuid()) NOT NULL PRIMARY KEY,
                 user_id INT NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )  ENGINE=INNODB;";
 

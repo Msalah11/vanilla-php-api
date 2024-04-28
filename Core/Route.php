@@ -20,6 +20,13 @@ class Route
     ];
 
     /**
+     * Represents the ID parameter for the route.
+     *
+     * @var string $params The ID parameter value.
+     */
+    public $params = "";
+
+    /**
      * Load routes file.
      *
      * @param string $file
@@ -87,15 +94,36 @@ class Route
      */
     public function call(string $uri, string $requestType)
     {
-        $callback = array_key_exists($uri, $this->routes[$requestType]) ?? false;
-        if (!$callback) {
-            throw new NotFoundException();
+        foreach ($this->routes[$requestType] as $key => $value) {
+            if ($uri == $key || $this->compareStrings($uri, $key)) {
+                return $this->callAction(
+                    reset($this->routes[$requestType][$key]),
+                    end($this->routes[$requestType][$key])
+                );
+            }
         }
 
-        return $this->callAction(
-            reset($this->routes[$requestType][$uri]),
-            end($this->routes[$requestType][$uri])
-        );
+        throw new NotFoundException();
+    }
+
+    /**
+     * Compare two strings to check if they match using regular expressions.
+     *
+     * @param string $url The URL to compare.
+     * @param string $uri The URI pattern to compare against.
+     * @return bool Returns true if the strings match, false otherwise.
+     */
+    protected function compareStrings(string $url, string $uri)
+    {
+        $urlPattern = $uri;
+        $regexPattern = '/^' . str_replace('\{id\}', '(.+)', preg_quote($urlPattern, '/')) . '$/';
+
+        if (!preg_match($regexPattern, $url, $matches))
+            return false;
+
+        $this->params = $matches[1];
+
+        return true;
     }
 
     /**
@@ -122,6 +150,9 @@ class Route
             );
         }
 
-        return $controller->$action();
+        if ($this->params == "")
+            return $controller->$action();
+
+        return $controller->$action($this->params);
     }
 }

@@ -20,7 +20,8 @@ class m0001_create_users_table
                 email VARCHAR(255) NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 password VARCHAR(512) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )  ENGINE=INNODB;";
 
         $this->builder->execute($query);
